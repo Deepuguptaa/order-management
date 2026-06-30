@@ -1,0 +1,135 @@
+{
+  "info": {
+    "name": "Order Management API",
+    "_postman_id": "order-management-collection",
+    "description": "Complete API collection for the Order Management System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "BASE_URL", "value": "http://localhost:5000/api" },
+    { "key": "SCHEDULER_SECRET_KEY", "value": "your-scheduler-secret-here" },
+    { "key": "ORDER_ID", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Create Order",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{BASE_URL}}/orders",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerName\": \"Rahul Sharma\",\n  \"phoneNumber\": \"9876543210\",\n  \"productName\": \"Wireless Headphones\",\n  \"amount\": 2499,\n  \"paymentStatus\": \"PAID\",\n  \"idempotencyKey\": \"unique-key-{{$randomUUID}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "List All Orders",
+          "request": {
+            "method": "GET",
+            "url": "{{BASE_URL}}/orders"
+          }
+        },
+        {
+          "name": "List Orders by Status (PLACED)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{BASE_URL}}/orders?status=PLACED&page=1&limit=20",
+              "query": [
+                { "key": "status", "value": "PLACED" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search Orders",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{BASE_URL}}/orders?search=Rahul",
+              "query": [{ "key": "search", "value": "Rahul" }]
+            }
+          }
+        },
+        {
+          "name": "Get Order by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{BASE_URL}}/orders/{{ORDER_ID}}"
+          }
+        },
+        {
+          "name": "Update Order Status",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{BASE_URL}}/orders/{{ORDER_ID}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"SHIPPED\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Payment Status",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{BASE_URL}}/orders/{{ORDER_ID}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"paymentStatus\": \"PAID\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Scheduler",
+      "item": [
+        {
+          "name": "Trigger Status Update (Protected)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "x-scheduler-key", "value": "{{SCHEDULER_SECRET_KEY}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{BASE_URL}}/scheduler/run-status-update"
+          }
+        },
+        {
+          "name": "Get Scheduler Logs",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{BASE_URL}}/scheduler/logs?page=1&limit=20",
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:5000/health"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+name: Order Status Scheduler
+
+# Alternative external scheduler option (use INSTEAD OF the in-process
+# node-cron job when deploying to a platform with ephemeral/sleeping
+# instances, e.g. free-tier Render). Set ENABLE_INTERNAL_CRON=false on the
+# backend in that case to avoid double-running the job.
+#
+# Required repository secrets:
+#   BACKEND_URL            e.g. https://your-app.onrender.com
+#   SCHEDULER_SECRET_KEY   must match the backend's SCHEDULER_SECRET_KEY
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch: {}
+
+jobs:
+  trigger-status-update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call scheduler endpoint
+        run: |
+          response=$(curl -s -o /tmp/response.json -w "%{http_code}" \
+            -X POST "${{ secrets.BACKEND_URL }}/api/scheduler/run-status-update" \
+            -H "x-scheduler-key: ${{ secrets.SCHEDULER_SECRET_KEY }}" \
+            -H "Content-Type: application/json")
+          echo "HTTP status: $response"
+          cat /tmp/response.json
+          if [ "$response" -ge 400 ]; then
+            echo "Scheduler call failed"
+            exit 1
+          fi
