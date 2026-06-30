@@ -385,6 +385,3 @@ Scheduler logs are a cross-cutting concern — a single run affects many orders.
 - **Write scaling**: The scheduler uses atomic `findOneAndUpdate` with the status in the filter — safe under MongoDB's document-level locking with no application-level coordination needed.
 - **Scheduler scaling**: Moving to an external scheduler (GitHub Actions / Cloud Scheduler) decouples scheduling from the API process, so the API can scale horizontally without multiple in-process crons competing.
 - **Pagination**: All list endpoints paginate (default 20, max 100) to prevent unbounded result sets.
-#   O r d e r   M a n a g e m e n t   S y s t e m  
-  
- 
